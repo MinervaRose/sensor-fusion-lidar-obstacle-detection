@@ -12,7 +12,32 @@
 
 Udacity Sensor Fusion Nanodegree Project
 
+3D obstacle detection using LiDAR point clouds, RANSAC segmentation,
+Euclidean clustering, and KD-Tree acceleration.
+
 </div>
+
+---
+
+## Demo
+
+<p align="center">
+  <img src="lidar-obstacle-detection.gif" width="850">
+</p>
+
+### What you're seeing
+
+- Green points → road surface
+- Colored clusters → detected obstacles
+- Red bounding boxes → object detections
+- Vertical pole on the right correctly isolated as an independent object
+
+The pipeline combines:
+
+- 3D RANSAC segmentation
+- Euclidean clustering
+- KD-Tree nearest-neighbor search
+- Bounding box generation
 
 ---
 
