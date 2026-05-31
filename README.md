@@ -1,31 +1,293 @@
-# Sensor Fusion Self-Driving Car Course
+<div align="center">
 
-<img src="https://github.com/awbrown90/SensorFusionHighway/blob/master/media/ObstacleDetectionFPS.gif" width="700" height="400" />
+# 📡 Sensor Fusion — LiDAR Obstacle Detection
 
-### Welcome to the Sensor Fusion course for self-driving cars.
+### 3D Point Cloud Processing for Autonomous Vehicles
 
-In this course we will be talking about sensor fusion, whch is the process of taking data from multiple sensors and combining it to give us a better understanding of the world around us. we will mostly be focusing on two sensors, lidar, and radar. By the end we will be fusing the data from these two sensors to track multiple cars on the road, estimating their positions and speed.
+![C++](https://img.shields.io/badge/C++-Autonomous_Systems-blue?style=for-the-badge&logo=cplusplus)
+![LiDAR](https://img.shields.io/badge/LiDAR-3D_Perception-green?style=for-the-badge)
+![Sensor Fusion](https://img.shields.io/badge/Sensor_Fusion-Obstacle_Detection-orange?style=for-the-badge)
+![Computer Vision](https://img.shields.io/badge/Computer_Vision-Point_Clouds-red?style=for-the-badge)
+![Robotics](https://img.shields.io/badge/Robotics-Perception-purple?style=for-the-badge)
 
-**Lidar** sensing gives us high resolution data by sending out thousands of laser signals. These lasers bounce off objects, returning to the sensor where we can then determine how far away objects are by timing how long it takes for the signal to return. Also we can tell a little bit about the object that was hit by measuring the intesity of the returned signal. Each laser ray is in the infrared spectrum, and is sent out at many different angles, usually in a 360 degree range. While lidar sensors gives us very high accurate models for the world around us in 3D, they are currently very expensive, upwards of $60,000 for a standard unit.
+Udacity Sensor Fusion Nanodegree Project
 
-**Radar** data is typically very sparse and in a limited range, however it can directly tell us how fast an object is moving in a certain direction. This ability makes radars a very pratical sensor for doing things like cruise control where its important to know how fast the car infront of you is traveling. Radar sensors are also very affordable and common now of days in newer cars.
+</div>
 
-**Sensor Fusion** by combing lidar's high resoultion imaging with radar's ability to measure velocity of objects we can get a better understanding of the sorrounding environment than we could using one of the sensors alone.
+---
 
+# Overview
 
-## Installation
+Before an autonomous vehicle can make decisions, it must first understand its surroundings.
 
-### Linux Ubuntu 16
+This project implements a LiDAR-based obstacle detection pipeline capable of identifying vehicles and other obstacles from raw 3D point cloud data.
 
-Install PCL, C++
+The system processes LiDAR measurements and transforms them into structured information about the environment through:
 
-The link here is very helpful, 
-https://larrylisky.com/2014/03/03/installing-pcl-on-ubuntu/
+- Ground plane segmentation
+- Point cloud clustering
+- Object detection
+- Bounding box generation
 
-A few updates to the instructions above were needed.
+The resulting perception pipeline allows the autonomous vehicle to distinguish the road surface from surrounding obstacles and estimate the position of nearby objects.
 
-* libvtk needed to be updated to libvtk6-dev instead of (libvtk5-dev). The linker was having trouble locating libvtk5-dev while building, but this might not be a problem for everyone.
+---
 
-* BUILD_visualization needed to be manually turned on, this link shows you how to do that,
-http://www.pointclouds.org/documentation/tutorials/building_pcl.php
+# Project Objectives
 
+The goals of this project were to:
+
+- Process raw LiDAR point cloud data
+- Segment the road surface
+- Detect obstacles
+- Cluster object points
+- Generate 3D bounding boxes
+- Track object detection consistency across frames
+
+---
+
+# Perception Pipeline
+
+```text
+LiDAR Point Cloud
+          ↓
+Filtering
+          ↓
+Ground Segmentation
+          ↓
+Obstacle Extraction
+          ↓
+Euclidean Clustering
+          ↓
+Bounding Box Generation
+          ↓
+Detected Objects
+```
+
+---
+
+# Point Cloud Processing
+
+The project operates directly on raw 3D LiDAR measurements.
+
+Each point represents a reflected laser return and contains spatial information describing the environment.
+
+Point clouds provide:
+
+- Object geometry
+- Relative position
+- Scene structure
+
+without relying on image-based perception.
+
+---
+
+# Ground Segmentation
+
+One of the first challenges in LiDAR perception is separating the road surface from obstacles.
+
+This project uses a custom implementation of:
+
+## 3D RANSAC Plane Segmentation
+
+RANSAC is used to identify the dominant ground plane.
+
+Benefits:
+
+- Robust to noise
+- Robust to outliers
+- Efficient for large point clouds
+
+The resulting segmentation separates:
+
+✅ Road surface
+
+✅ Obstacles
+
+The implementation follows the 3D RANSAC algorithm developed during the course. :contentReference[oaicite:0]{index=0}
+
+---
+
+# Obstacle Clustering
+
+Once the road plane has been removed, the remaining points correspond to potential obstacles.
+
+The project uses:
+
+## Euclidean Clustering
+
+Nearby points are grouped together into clusters representing individual objects.
+
+The clustering implementation uses:
+
+- Euclidean distance metrics
+- KD-Tree acceleration
+- Recursive cluster expansion
+
+This approach allows individual vehicles and roadside objects to be isolated from the environment. :contentReference[oaicite:1]{index=1}
+
+---
+
+# KD-Tree Acceleration
+
+To improve performance, the clustering process relies on a custom KD-Tree implementation.
+
+Benefits include:
+
+- Fast nearest-neighbor search
+- Reduced computational cost
+- Scalable point cloud processing
+
+KD-Trees are widely used throughout robotics, computer vision, and spatial search applications.
+
+---
+
+# Bounding Box Generation
+
+After clustering, the system computes 3D bounding boxes around detected objects.
+
+The final output:
+
+- Encloses vehicles
+- Encloses roadside obstacles
+- Produces one bounding box per detected object
+- Maintains detection consistency across multiple frames
+
+Bounding boxes provide a simplified representation that can later be used for:
+
+- Tracking
+- Prediction
+- Path planning
+- Collision avoidance
+
+---
+
+# Technical Skills Demonstrated
+
+## Sensor Fusion
+
+- LiDAR Processing
+- 3D Perception
+- Environmental Understanding
+
+## Robotics
+
+- Obstacle Detection
+- Spatial Reasoning
+- Point Cloud Processing
+
+## Algorithms
+
+- RANSAC
+- Euclidean Clustering
+- KD-Tree Search
+
+## Software Engineering
+
+- Modern C++
+- Numerical Computing
+- Real-Time Processing
+
+---
+
+# Repository Structure
+
+```text
+src/
+├── processPointClouds.cpp
+├── processPointClouds.h
+├── kdtree.h
+├── cluster.cpp
+├── segmentation.cpp
+
+data/
+├── point_clouds/
+
+README.md
+```
+
+---
+
+# Results
+
+The completed pipeline successfully:
+
+✅ Segments the road surface
+
+✅ Identifies obstacle points
+
+✅ Clusters individual objects
+
+✅ Generates bounding boxes
+
+✅ Maintains detection consistency across frames
+
+The resulting perception system provides a simplified but realistic example of LiDAR-based object detection for autonomous vehicles.
+
+---
+
+# Key Concepts Explored
+
+- LiDAR Perception
+- Point Clouds
+- 3D Geometry
+- RANSAC
+- Plane Segmentation
+- Euclidean Clustering
+- KD-Trees
+- Obstacle Detection
+- Autonomous Driving
+
+---
+
+# Why This Project Matters
+
+Modern autonomous vehicles depend heavily on 3D perception systems.
+
+LiDAR remains one of the most important sensing technologies for:
+
+- Autonomous vehicles
+- Mobile robots
+- Drones
+- Warehouse automation
+- Mapping systems
+
+This project demonstrates how raw sensor measurements can be transformed into meaningful environmental understanding.
+
+---
+
+# Related Sensor Fusion Projects
+
+This repository is part of a broader autonomous systems portfolio including:
+
+- Extended Kalman Filter Sensor Fusion
+- LiDAR Obstacle Detection
+- Kidnapped Vehicle Localization
+- Highway Path Planning
+- PID Control
+
+Together these projects cover perception, localization, planning, and control for autonomous systems.
+
+---
+
+# Learning Outcomes
+
+This project provided practical experience with:
+
+- LiDAR data processing
+- Point cloud segmentation
+- Spatial clustering
+- Real-time obstacle detection
+- Robotics perception pipelines
+
+It also serves as a foundation for more advanced perception systems combining LiDAR, radar, cameras, and deep learning.
+
+---
+
+# Disclaimer
+
+This repository is provided for educational and portfolio purposes.
+
+Students may study the code and reports for learning purposes, but submitting this work as coursework would constitute plagiarism and may violate academic integrity policies.
+
+Copyright © Sabrina Palis
